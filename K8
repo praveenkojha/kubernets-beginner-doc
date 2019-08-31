@@ -1,0 +1,9 @@
+Kubernetes is an orchestration engine and open-source Platform for managing containerized application workload & services. Kubernetes is also commonly referred to as K8s.
+Advantages of Kubernetes:
+1.It can speed up the Deployment Process bu making easy, automated deployments, updates(Rolling Updates) and By managing our apps and services with almost zero downtime.
+2.Kubernetes also provide self-healing.
+3.We can also say it can make better use of Hardware to maximize resources.
+4.It can use to Scale the containerized applications and their resources without any Downtime and on the fly.
+5.It helps us to package up an application and deployed them on Kubernetes with basic knowledge of Docker
+6.It is also helpful to deploy an application with multiple replicas with Adhoc command
+
