@@ -1,0 +1,106 @@
+ubuntu 18.04 LTS
+============================
+Steps tp perform in both Master & Worker
+============================
+install openssh, so that you can connect using putty or Mobaxterm
+Install OpenSSH
+sudo apt-get install openssh-server 
+
+now switch to root 
+sudo su
+apt-get update
+swapoff -a
+nano /etc/fstab
+change hostname :
+/etc/hostname
+==>master
+/etc/hosts
+192.x.x.x  master
+192.x.x.x  worker1
+192.x.x.x  worker2
+
+install Docker
+Now we have to install Docker because Docker images will be used for managing the containers in the cluster. Run the following commands:
+# sudo su
+# apt-get update 
+# apt-get install -y docker.io
+
+Next we have to install these 3 essential components for setting up Kubernetes environment: kubeadm, kubectl, and kubelet.
+
+Run the following commands before installing the Kubernetes environment.
+
+# apt-get update && apt-get install -y apt-transport-https curl
+# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+# cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+# apt-get update
+Install kubeadm, Kubelet And Kubectl 
+Now its time to install the 3 essential components. 
+Kubelet is the lowest level component in Kubernetes. 
+It’s responsible for what’s running on an individual machine. 
+Kuebadm is used for administrating the Kubernetes cluster. 
+Kubectl is used for controlling the configurations on various nodes inside the cluster.
+
+apt-get install -y kubelet kubeadm kubectl
+              Updating Kubernetes Configuration
+Next, we will change the configuration file of Kubernetes. Run the following command:
+
+# vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+This will open a text editor, enter the following line after the last “Environment Variable”:
+
+Environment=”cgroup-driver=systemd/cgroup-driver=cgroupfs”
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+Steps Only For Kubernetes Master VM (kmaster)
+Note: These steps will only be executed on the master node (kmaster VM).
+
+Step 1: We will now start our Kubernetes cluster from the master’s machine. Run the following command:
+
+for calico network:(https://docs.projectcalico.org/v3.7/getting-started/kubernetes
+
+kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=192.168.18.148(my master ip)
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Install Calico with the following command.
+
+kubectl apply -f https://docs.projectcalico.org/v3.7/manifests/calico.yaml
+
+watch kubectl get pods --all-namespaces
+--------------------------------------------------------------------------------------------------------------------------------
+
+------------------------Now Steps only for  Worker node to join to master node----------------------  
+
+copy the join command from master and keep safe and run in worker node
+
+kubeadm join 192.168.18.149:6443 --token y437xz.e68u66j8fr3pj8az --discovery-token-ca-cert-hash sha256:de326331d47316bcd4edf0114786185110fc300e8d53733aa05c104af8611f2f
+
+the Final command for  master nodes for checks
+
+@master:~# kubectl get nodes
+             NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   44h   v1.15.3
+node1    Ready    <none>   44h   v1.15.3
+node2    Ready    <none>   20h   v1.15.3
+
+kubectl get pods --all-namespaces
+
+NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE
+kube-system   calico-kube-controllers-74b4db5cc9-6g25n   1/1     Running   0          44h
+kube-system   calico-node-bdjwt                          1/1     Running   0          44h
+kube-system   calico-node-cnvqf                          1/1     Running   0          20h
+kube-system   calico-node-dhdxw                          1/1     Running   0          44h
+kube-system   coredns-5c98db65d4-g5mgv                   1/1     Running   0          44h
+kube-system   coredns-5c98db65d4-t7ggc                   1/1     Running   0          44h
+kube-system   etcd-master                                1/1     Running   0          44h
+kube-system   kube-apiserver-master                      1/1     Running   0          44h
+kube-system   kube-controller-manager-master             1/1     Running   0          44h
+kube-system   kube-proxy-4cz46                           1/1     Running   0          44h
+kube-system   kube-proxy-h8mzm                           1/1     Running   0          44h
+kube-system   kube-proxy-mbrs5                           1/1     Running   0          20h
+kube-system   kube-scheduler-master                      1/1     Running   0          44h
+
