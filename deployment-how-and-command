@@ -1,0 +1,122 @@
+what is Deployment?
+Most of the time when you are dealing with kubernetes that means you are dealing with yaml file.
+A deployment is a blueprint for pod that is to be created
+A deployment will create a pod by it's spec from the template
+
+Example.....
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+		
+
+Explanation....
+
+what is the type of yaml it's?----> Kind: Deployment
+A Deployment named nginx-deployment is created
+The Deployment creates three replicated Pods, indicated by the replicas field.
+The selector field defines how the Deployment finds which Pods to manage. In this case, we select a label that is defined in the Pod template (app: nginx)
+
+The template field contains the following sub-fields.....
+The Pods are labeled app: nginxusing the labels field.
+spec field:  
+indicates that the Pods run one container, nginx, which runs the nginx Docker Hub image at version 1.7.9
+Create one container and name it nginx using the name field
+
+Command:
+1.How to create deployment?
+kubectl create -f nginx-deployment.yaml
+@master:~/kub-test-folder# kubectl create -f nginx-deployment.yaml
+deployment.apps/nginx-deployment created
+
+
+2.check if the Deployment was created
+kubectl get deployments
+@master:~/kub-test-folder# kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   0/0     0            0           33s
+
+	
+3.To see the labels automatically generated for each Pod 
+kubectl get pods --show-labels
+
+@master:~/kub-test-folder#  kubectl get deployments --show-labels
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE   LABELS
+nginx-deployment   0/0     0            0           91s   app=nginx
+
+4.If you want to see your written yaml?
+kubectl get deployment nginx-deployment -o yaml
+
+
+---------------------------------------------------------------------------------------------------------------
+Rolling-update method
+------------------------------------------
+
+lets say our devloper have devloped a new version of nginx to be deployed & we have to deploy in such a way that we dont have any Downtime & services are interrupted.
+ 
+you have to deploy new version of nginx-1.8
+
+1.kubectl set image deployment/nginx-deployment nginx=nginx:1.8
+  deployment.extensions/nginx-deployment image updated
+
+2.To check the status of rollout?
+   @master:~/kub-test-folder#   kubectl rollout status deployment/nginx-deployment
+    deployment "nginx-deployment" successfully rolled out
+
+3.To chekc details of rollout status?
+  @master:~/kub-test-folder#   kubectl describe deployment nginx-deployment
+
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=nginx
+  Containers:
+   nginx:
+    Image:        nginx:1.8
+======> you can see nginx:1.8 is updated
+
+4.you can also change in .yaml file and apply it.
+
+kubect apply -f nginx-deployment
+
+----------------------------------------------------------------------------------------------------------------------
+
+Rollback method & command
+
+------------------------------------------------
+
+1.How to back out from the version which you have deployed?
+
+@master:~/kub-test-folder#  kubectl rollout history deployment/nginx-deployment
+
+deployment.extensions/nginx-deployment
+REVISION  CHANGE-CAUSE
+1         <none>
+3         <none>
+4         <none>
+
+2. If you want to rollout  the deployment to particular deployment version(like version 2)?
+
+kubectl rollout history undo deployment/nginx-deployment --to-revision=2
+
+now change the revision version to the yaml file & apply again & the image will updated.
+
+kubectl apply -f nginx-deployment
+
