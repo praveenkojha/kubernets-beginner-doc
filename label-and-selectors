@@ -1,0 +1,51 @@
+                          Labels & Selectors
+
+Labels are key/value pairs that are attached to Kubernetes.
+They are used as identifying attributes for objects such as pods and replication controller
+
+Selectors:
+They are used by the users to select a set of objects.
+
+example:
+1. If you have pod running with name- nginx-8glqx
+
+2. for your convience you can label the pod as: 
+
+command:
+--->kubecl label pod nginx-8glqx nginx=test  --overwrite
+
+3. if you want to find more details about label, then you can use:
+command:
+-- kubectl describe pod -l  nginx=test
+
+@master:~/kub-test-folder# kubectl describe deployment -l app=nginx
+Name:                   nginx-deployment
+Namespace:              default
+CreationTimestamp:      Thu, 05 Sep 2019 11:38:20 +0530
+Labels:                 app=nginx
+                        nginx=test
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx
+
+
+
+4. to delete the label:
+--kubectl delete deployment -l nginx=test
+deployment.extensions "nginx-deployment" deleted
+
+-------------------------------------------------------------------------------
+ Selectors
+
+selectors allow filtering of keys according to a set of values
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-app
+spec:
+   ports:
+      - port: 0000
+      name: nginx
+   type: NodePort
+   selector:
+      app: nginx ---------> 1
