@@ -1,0 +1,67 @@
+we aregoing to manually schedule particular pod to particular pod---
+sometime we are need to schedule a particular pod to run on particular hardware.
+we are going to use label here, for our nodes so that it can be easily identified.
+
+1.how to label a node?
+
+lets say i have two nodes(master,node2), and want to label node2 & wanted to run my nginx to node2.
+
+@master:~# kubectl get nodes
+
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   20h   v1.15.3
+node2    Ready    <none>   20h   v1.15.3
+
+
+t@master:~# kubectl label node node2 lab=node2
+node/node2 labeled
+
+we can check that now.
+
+@master:~# kubectl describe node node2
+Name:               node2
+Roles:              <none>
+Labels:            lab=node2
+
+
+@master:~/kub-test-folder# kubectl create -f node-nginx.yaml
+pod/nginx created
+
+@master:~/kub-test-folder# kubectl describe pod nginx
+Name:         nginx
+Namespace:    default
+Priority:     0
+Node:         node2/xxx.xxx.xx.xx
+
+
+2. the other part is like you can add nodeSelector in spec which matches the label.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+        #  nodeName: node2 # schedule pod to specific node
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    lab: node2
+
+
+@master:~/kub-test-folder# kubectl create -f node-nginx.yaml
+pod/nginx created
+
+@master:~/kub-test-folder# kubectl describe pod nginx
+Name:         nginx
+Namespace:    default
+Priority:     0
+Node:         node2/xxx.xxx.xx.xx
+
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  90s   default-scheduler  Successfully assigned default/nginx to node2
+
+
