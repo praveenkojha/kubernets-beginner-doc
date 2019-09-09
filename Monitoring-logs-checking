@@ -1,0 +1,33 @@
+Monitoring cluster:
+---Heapster---
+Its is a cluster wide aggregator for monitoring and event data.
+Heapster run as pod inside the cluster.
+Heapster pod discover all the nodes in the cluster & query usage information from node kubelet & kubelete fetches data from cAdvisor,
+then the data sent to storage backend for visulization process, in that we can use influxdb using grafana.
+
+kubelet/cAdvisor on the node---> Heapster runs on single node with Kubelet/Cadvisor(communicates with master)---->storage Backend(stores data from Heapster)
+
+cAdvisor is an container resource usage and performance analysis agent.
+
+The Default dashboard of Kubernete contains an example dashboard that monitors resorces usage of cluster and the pods inside of it,the dashboard can be fully customized and expanded.
+
+
+-----------------------
+How to check logs in Kubernetes
+
+kubectl logs <pod-name>
+
+you can go inside the kubernetes path.
+
+cd /var/log/containers
+@master:/var/log/containers# ls
+calico-kube-controllers-74b4db5cc9-m4lgr_kube-system_calico-kube-controllers-27d29e7442634c2dc9f22ee7c.log
+calico-kube-controllers-74b4db5cc9-m4lgr_kube-system_calico798ef0389adf0bd96b05b82d78da472d8c53b89310.log
+calico-node-mc2pq_kube-system_calico-node-624de0ee1ad23ce81df5d70b1564d7bfa60deaa71295d61adf7b.log
+calico-node-mc2pq_kube-system_calico-node-d369038cfe0431004319d05cfb97a8f780b2fb1501cd5d15c3ffb0c7436.log
+calico-node-mc2pq_kube-system_install-cni-370e3f176c57d80be556a8ea420b429b62fc0503160a5917e6d2d1df.log
+calico-node-mc2pq_kube-system_upgrade-ipam-d8ec593b91744b47058652049f01c8a637a5ecbe0683b0204663f947b.log
+coredns-5c98db65d4-grz2m_kube-system_coredns-364beee14f9c371b5bef848f187aa7e8de493bb123a9fe7ae130ff4e42.log
+
+
+tail -f calico-kube-controllers-74b4db5cc9-m4lgr_kube-system_calico-kube-controllers-20ee7c.log
