@@ -1,0 +1,26 @@
+# Master Node
+6443        Kubernetes api
+2379-2380   etcd server client api
+10205       kubelet api
+10251       kube-scheduler
+10252       kube-controller-manager
+10255       read-only kubelet api
+
+# Worker node
+
+10250        kubelet api
+10255        read-only kubelet api
+3000-32767   node port services
+
+
+How to expose pod to outside world?
+we can use "expose" command for this
+
+kubectl expose deployment <name-of-deployment> --type= "Node-Port" --port 80
+service <name-of-deployment> exposed
+
+How to expose pod to outside world using "ip"
+kubectl expose <name-of-deployment> --type= "cluster-ip" --name=<service-name> 
+
+How to delete services?
+kubectl delete service <service-name>
